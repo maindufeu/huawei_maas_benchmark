@@ -1,0 +1,36 @@
+# Reference pricing snapshot — USD per 1M tokens (Framework v1.0 Table 5, 30 Jun 2026).
+# Edit freely; the app reads $/successful-task from here. Keys are matched against the
+# model id (case-insensitive, substring-tolerant) so "glm-5.2" matches "GLM-5.2".
+# A key may also be a vendor-tagged PROVIDER name ("azure:deepseek-v3.2") — it wins
+# over the plain model key, so the same model on two vendors can carry two prices.
+# `unknown` marks a rate the doc did not publish — set it before quoting cost numbers.
+
+models:
+  # Huawei MaaS (ModelArts console "Infer Price", 3 Jul 2026 — $/1k × 1000)
+  glm-5.2:                  {input: 1.40, output: 4.40, cached_input: 0.26}
+  glm-5.1:                  {input: 1.078, output: 3.774, cached_input: 0.26, note: "console range 0.809-1.078 / 3.235-3.774; upper bound used"}
+  glm-5:                    {input: 0.809, output: 2.965, note: "console range 0.539-0.809 / 2.426-2.965; upper bound used"}
+  deepseek-v4-pro:          {input: 1.617, output: 3.235}
+  deepseek-v4-flash:        {input: 0.135, output: 0.27}
+  deepseek-v3.2:            {input: 0.27, output: 0.404}
+  deepseek-v3.1-terminus:   {input: 0.539, output: 1.617, note: "console: DeepSeek-V3.1"}
+  deepseek-v3:              {input: 0.27, output: 1.078}
+  qwen3-32b:                {input: 0.30, output: 0.60}
+  deepseek-r1-250528:       {input: 0.539, output: 2.156, note: "console: DeepSeek-R1-0528"}
+  # Azure AI Foundry (pricing pages, 3 Jul 2026 — Global rates). Provider-tagged
+  # so DeepSeek on Azure doesn't inherit the cheaper Huawei MaaS rate above.
+  azure:deepseek-v3.2:      {input: 0.58, output: 1.68}
+  azure:deepseek-v4-pro:    {input: 1.74, output: 3.48}
+  azure:deepseek-v4-flash:  {input: 0.19, output: 0.51}
+  azure:kimi-k2.6:          {input: 0.95, output: 4.00}
+  kimi-k2.6:                {input: 0.95, output: 4.00, note: "Azure Global rate"}
+  # Baselines (Framework v1.0 Table 5)
+  claude-opus-4-8:          {input: 5.00, output: 25.00, cached_input: 0.50}
+  claude-sonnet-4-6:        {input: 3.00, output: 15.00, cached_input: 0.30}
+  claude-haiku-4-5:         {input: 1.00, output: 5.00,  cached_input: 0.10}
+  gpt-5.5:                  {input: 1.25, output: 10.00}
+  gemini-3-pro:             {input: 1.25, output: 10.00}
+  gemini-3.1-pro-preview:   {input: 1.25, output: 10.00}
+  gemini-3.5-flash:         {input: 0.30, output: 2.50, note: "approx; confirm on GCP"}
+  gemini-3-flash:           {input: 0.30, output: 2.50, note: "approx; confirm on GCP"}
+  # Self-hosted models (llama.cpp / Ollama / LM Studio) are auto-priced at $0.

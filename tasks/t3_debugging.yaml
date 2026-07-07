@@ -1,0 +1,80 @@
+# T3 — Debugging. A buggy module + failing behavior is given; the fix must make the
+# hidden test suite pass without changing the public API.
+
+- id: t3_binary_search_offbyone
+  class: T3
+  title: "Fix off-by-one in binary search"
+  language: python
+  difficulty: medium
+  timeout_seconds: 40
+  context_files:
+    buggy.py: |
+      def binary_search(arr, target):
+          lo, hi = 0, len(arr)
+          while lo < hi:
+              mid = (lo + hi) // 2
+              if arr[mid] == target:
+                  return mid
+              elif arr[mid] < target:
+                  lo = mid
+              else:
+                  hi = mid
+          return -1
+  prompt: |
+    The function `binary_search(arr, target)` in `buggy.py` returns the index of `target`
+    in a sorted ascending list, or -1 if absent. It currently hangs or returns wrong results
+    for some inputs. Fix the bug(s) WITHOUT changing the signature. Return ONLY a single
+    ```python code block importable as `solution` defining the corrected `binary_search`.
+    No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      from solution import binary_search as bs
+      def test_found():
+          assert bs([1, 3, 5, 7, 9], 7) == 3
+      def test_first():
+          assert bs([1, 3, 5], 1) == 0
+      def test_last():
+          assert bs([1, 3, 5], 5) == 2
+      def test_absent():
+          assert bs([1, 3, 5], 4) == -1
+      def test_empty():
+          assert bs([], 1) == -1
+      def test_no_hang_two_elems():
+          assert bs([1, 2], 2) == 1
+
+- id: t3_flatten_recursion
+  class: T3
+  title: "Fix nested-list flatten"
+  language: python
+  difficulty: medium
+  timeout_seconds: 40
+  context_files:
+    buggy.py: |
+      def flatten(x):
+          result = []
+          for el in x:
+              if isinstance(el, list):
+                  result.append(flatten(el))   # bug: appends the sublist instead of extending
+              else:
+                  result.append(el)
+          return result
+  prompt: |
+    `flatten(x)` in `buggy.py` should turn an arbitrarily nested list of integers into a flat
+    list preserving order, e.g. flatten([1, [2, [3, 4]], 5]) == [1, 2, 3, 4, 5]. It is broken.
+    Fix it WITHOUT changing the signature. Return ONLY a single ```python code block importable
+    as `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      from solution import flatten
+      def test_simple():
+          assert flatten([1, 2, 3]) == [1, 2, 3]
+      def test_nested():
+          assert flatten([1, [2, [3, 4]], 5]) == [1, 2, 3, 4, 5]
+      def test_deep():
+          assert flatten([[[[1]]], 2, [[3]]]) == [1, 2, 3]
+      def test_empty():
+          assert flatten([]) == []

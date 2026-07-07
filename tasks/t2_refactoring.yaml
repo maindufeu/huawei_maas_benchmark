@@ -1,0 +1,82 @@
+# T2 — Completion / refactoring. Legacy code is given as context; the refactor must
+# preserve behavior. Graded by running the ORIGINAL test suite against the new code.
+
+- id: t2_extract_and_clean
+  class: T2
+  title: "Refactor a tangled discount function"
+  language: python
+  difficulty: medium
+  timeout_seconds: 45
+  context_files:
+    legacy.py: |
+      def calc(items, c):
+          t = 0
+          for i in items:
+              t = t + i[0] * i[1]
+          if c == "GOLD":
+              t = t - t * 0.2
+          elif c == "SILVER":
+              t = t - t * 0.1
+          elif c == "BRONZE":
+              t = t - t * 0.05
+          if t < 0:
+              t = 0
+          return round(t, 2)
+  prompt: |
+    The file `legacy.py` computes an order total with a customer-tier discount.
+    Refactor it for readability and maintainability WITHOUT changing behavior:
+    keep a function named `calc(items, c)` with the same signature and return values,
+    where `items` is a list of (unit_price, quantity) tuples and `c` is the tier string.
+    Use clear names and remove magic where reasonable. Return ONLY a single ```python
+    code block importable as `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      from solution import calc
+      def test_no_tier():
+          assert calc([(10.0, 2), (5.0, 1)], "NONE") == 25.0
+      def test_gold():
+          assert calc([(100.0, 1)], "GOLD") == 80.0
+      def test_silver():
+          assert calc([(50.0, 2)], "SILVER") == 90.0
+      def test_bronze():
+          assert calc([(20.0, 5)], "BRONZE") == 95.0
+      def test_empty():
+          assert calc([], "GOLD") == 0
+
+- id: t2_py39_to_py312
+  class: T2
+  title: "Modernize legacy typing to 3.12"
+  language: python
+  difficulty: easy
+  timeout_seconds: 40
+  context_files:
+    legacy.py: |
+      from typing import List, Dict, Optional, Union
+      def group_by_parity(nums: List[int]) -> Dict[str, List[int]]:
+          out = {"even": [], "odd": []}
+          for n in nums:
+              out["even" if n % 2 == 0 else "odd"].append(n)
+          return out
+      def first_or_none(xs: List[int]) -> Optional[int]:
+          return xs[0] if xs else None
+  prompt: |
+    Modernize `legacy.py` to Python 3.12 idioms: replace `typing.List/Dict/Optional/Union`
+    with built-in generics and the `X | None` union syntax, and remove the now-unnecessary
+    `typing` import. Keep the two functions `group_by_parity` and `first_or_none` with the
+    same behavior and signatures. Return ONLY a single ```python code block importable as
+    `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      import solution, inspect
+      def test_behavior():
+          assert solution.group_by_parity([1, 2, 3, 4]) == {"even": [2, 4], "odd": [1, 3]}
+          assert solution.first_or_none([]) is None
+          assert solution.first_or_none([9, 8]) == 9
+      def test_no_typing_import():
+          src = inspect.getsource(solution)
+          assert "from typing import" not in src, "should not import List/Dict/Optional"
+          assert "List[" not in src and "Dict[" not in src, "use built-in generics"

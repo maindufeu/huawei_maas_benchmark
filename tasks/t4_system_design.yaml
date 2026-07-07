@@ -1,0 +1,38 @@
+# T4 — System design. No single correct answer -> graded by LLM-as-judge rubric.
+# Requires a judge provider to be configured in the UI; otherwise these are skipped.
+
+- id: t4_llm_router
+  class: T4
+  title: "Cost-aware multi-model LLM router"
+  language: text
+  difficulty: hard
+  timeout_seconds: 120
+  max_tokens: 2048
+  prompt: |
+    Design a cost-aware routing layer for an internal developer copilot (Frida ITA) that
+    orchestrates 75+ models across several providers. Requirements: classify each request by
+    complexity + latency-sensitivity + data-sensitivity; route cheap requests to a low-cost
+    model and escalate to a frontier model only when a confidence check fails; enforce a per-
+    team budget; and keep an audit trail. Describe the components, the routing policy, the
+    escalation signal, and the main failure modes and mitigations. Be concrete and concise.
+  evaluation:
+    type: judge
+    rubric: [correctness, completeness, tradeoff_reasoning, clarity]
+    pass_threshold: 3.5
+
+- id: t4_multitenant_rag
+  class: T4
+  title: "Multi-tenant RAG with data isolation"
+  language: text
+  difficulty: hard
+  timeout_seconds: 120
+  max_tokens: 2048
+  prompt: |
+    Design a multi-tenant RAG service where each client's documents must be strictly isolated,
+    retrieval must be low-latency, and per-tenant usage must be metered for billing. Cover:
+    ingestion + chunking, the vector store layout for isolation, the query path, how you prevent
+    cross-tenant leakage, and how you meter cost. Note the key trade-offs. Be concrete and concise.
+  evaluation:
+    type: judge
+    rubric: [security_isolation, correctness, completeness, clarity]
+    pass_threshold: 3.5

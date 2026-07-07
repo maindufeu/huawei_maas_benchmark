@@ -1,0 +1,91 @@
+# T1 — Code generation (new code from scratch). Graded by sandboxed pytest.
+# The prompt fixes the public API so tests can import it deterministically.
+
+- id: t1_two_sum
+  class: T1
+  title: "Two-sum index lookup"
+  language: python
+  difficulty: easy
+  timeout_seconds: 30
+  prompt: |
+    Implement a function `two_sum(nums: list[int], target: int) -> list[int]` that
+    returns the indices of the two numbers in `nums` that add up to `target`.
+    Assume exactly one solution exists and you may not use the same element twice.
+    Return ONLY a single ```python code block defining `two_sum` in a file that can be
+    imported as `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      from solution import two_sum
+      def test_basic():
+          assert sorted(two_sum([2, 7, 11, 15], 9)) == [0, 1]
+      def test_middle():
+          assert sorted(two_sum([3, 2, 4], 6)) == [1, 2]
+      def test_dup():
+          assert sorted(two_sum([3, 3], 6)) == [0, 1]
+      def test_negatives():
+          assert sorted(two_sum([-1, -2, -3, -4, -5], -8)) == [2, 4]
+
+- id: t1_lru_cache
+  class: T1
+  title: "LRU cache class"
+  language: python
+  difficulty: medium
+  timeout_seconds: 40
+  prompt: |
+    Implement a class `LRUCache` with `__init__(self, capacity: int)`, `get(self, key) -> int`
+    (returns -1 if missing) and `put(self, key, value) -> None`, evicting the least-recently-used
+    item when capacity is exceeded. O(1) average for get/put.
+    Return ONLY a single ```python code block importable as `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      from solution import LRUCache
+      def test_eviction():
+          c = LRUCache(2)
+          c.put(1, 1); c.put(2, 2)
+          assert c.get(1) == 1
+          c.put(3, 3)            # evicts key 2
+          assert c.get(2) == -1
+          c.put(4, 4)            # evicts key 1
+          assert c.get(1) == -1
+          assert c.get(3) == 3
+          assert c.get(4) == 4
+      def test_update():
+          c = LRUCache(2)
+          c.put(1, 1); c.put(2, 2); c.put(1, 10)
+          c.put(3, 3)            # evicts key 2, not key 1 (recently used)
+          assert c.get(2) == -1
+          assert c.get(1) == 10
+
+- id: t1_parse_iso_duration
+  class: T1
+  title: "Parse ISO-8601 duration to seconds"
+  language: python
+  difficulty: medium
+  timeout_seconds: 40
+  prompt: |
+    Implement `iso_duration_to_seconds(s: str) -> int` that parses an ISO-8601 duration
+    of the form `PnDTnHnMnS` (days, hours, minutes, seconds; any component may be absent,
+    e.g. "PT1H30M", "P1DT2H", "PT45S") and returns the total number of seconds as an int.
+    Raise `ValueError` on malformed input. Return ONLY a single ```python code block
+    importable as `solution`. No explanation.
+  evaluation:
+    type: unit_test
+    entry: solution.py
+    tests: |
+      import pytest
+      from solution import iso_duration_to_seconds as f
+      def test_hm():
+          assert f("PT1H30M") == 5400
+      def test_day_hour():
+          assert f("P1DT2H") == 93600
+      def test_seconds():
+          assert f("PT45S") == 45
+      def test_all():
+          assert f("P1DT1H1M1S") == 90061
+      def test_bad():
+          with pytest.raises(ValueError):
+              f("1H30M")
